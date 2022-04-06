@@ -1,4 +1,5 @@
 import asyncio
+import os
 
 
 devices = set()
@@ -27,7 +28,7 @@ async def listener(reader, writer):
                 pass
             elif message.startswith('imei:'):
                 last += 1
-                with open("locations.csv", "a") as loc:
+                with open(os.path.join("data", "locations.csv"), "a") as loc:
                     loc.write("%d,%s\n" % (last, message.rstrip(";")))
             else:
                 print("what the fuck!")
@@ -45,7 +46,7 @@ async def listener(reader, writer):
 
 
 async def main():
-    server = await asyncio.start_server(listener, "195.251.117.224", 9999)  # '127.0.0.1', 8888
+    server = await asyncio.start_server(listener, "195.251.117.224", 9999)
 
     address = ', '.join(str(sock.getsockname()) for sock in server.sockets)
     print(f'Serving on {address}')

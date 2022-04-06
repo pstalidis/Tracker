@@ -1,6 +1,7 @@
 import pandas
 import folium
 import flask
+import os
 
 
 def dms2dd(sample):
@@ -14,7 +15,7 @@ app = flask.Flask("mapping")
 
 
 def get_map():
-    df = pandas.read_csv("locations.csv")
+    df = pandas.read_csv(os.path.join("data", "locations.csv"), index_col=0)
     df["datetime"] = pandas.to_datetime(df['datetime'], format='%y%m%d%H%M%S')
     # df["clock"] = pandas.to_datetime(df['clock'], format='%H%M%S').dt.time
     df["latitude"] = df.lat.apply(dms2dd)
@@ -59,4 +60,4 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(host="195.251.117.224", port=8181, debug=True)
+    app.run(host="127.0.0.1", port=8181, debug=True)
