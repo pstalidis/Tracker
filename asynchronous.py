@@ -3,7 +3,7 @@ import os
 
 
 devices = set()
-with open("locations.csv", "r") as file:
+with open(os.path.join("data", "locations.csv"), "r") as file:
     for line in file:
         clean = line.split(",")
     last = int(clean[0]) + 1
