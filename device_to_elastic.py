@@ -92,6 +92,7 @@ devices = set()
 
 async def listener(reader, writer):
     while True:
+        print("elastic index exists?", es.indices.exists(index='cobra'))
         try:
             data = await reader.readuntil(separator=b';')
             address = writer.get_extra_info('peername')
