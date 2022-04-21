@@ -2,12 +2,14 @@
 import folium
 import flask
 import sys
-# import os
+import time
 
 import elasticsearch
 from datetime import datetime, timedelta
 
 app = flask.Flask("mapping")
+
+time.sleep(60)
 
 es = elasticsearch.Elasticsearch(["elastic:9200"])
 if not es.indices.exists(index='cobra'):

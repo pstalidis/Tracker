@@ -1,6 +1,7 @@
 import asyncio
 import elasticsearch
 from datetime import datetime
+import time
 
 elastic_settings = {
     "settings": {
@@ -37,6 +38,8 @@ elastic_settings = {
         }
     }
 }
+
+time.sleep(60)
 
 es = elasticsearch.Elasticsearch(["elastic:9200"])
 if not es.indices.exists(index='cobra'):
