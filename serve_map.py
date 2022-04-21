@@ -15,7 +15,7 @@ app = flask.Flask("mapping")
 
 
 def get_map():
-    df = pandas.read_csv(os.path.join("data", "locations.csv"), index_col=0)
+    df = pandas.read_csv(os.path.join("data", "locations.csv.3"), index_col=0)
     df["datetime"] = pandas.to_datetime(df['datetime'], format='%y%m%d%H%M%S')
     # df["clock"] = pandas.to_datetime(df['clock'], format='%H%M%S').dt.time
     df["latitude"] = df.lat.apply(dms2dd)
@@ -56,7 +56,11 @@ def get_map():
 
 @app.route('/')
 def index():
-    return get_map().get_root().render()
+    m = get_map()
+    meta = '''<meta http-equiv="refresh" content="30">'''
+    m.get_root().header.add_child(folium.Element(meta))
+
+    return m.get_root().render()
 
 
 if __name__ == '__main__':
