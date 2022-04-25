@@ -91,8 +91,8 @@ devices = set()
 
 
 async def listener(reader, writer):
+    print("Starting listener; Elastic index: ", es.indices.exists(index='cobra'))
     while True:
-        print("elastic index exists?", es.indices.exists(index='cobra'))
         try:
             data = await reader.readuntil(separator=b';')
             address = writer.get_extra_info('peername')
@@ -116,6 +116,8 @@ async def listener(reader, writer):
             await writer.drain()
 
         except asyncio.exceptions.IncompleteReadError:
+            break
+        except ConnectionResetError:
             break
 
     print("Closing the connection")

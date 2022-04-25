@@ -15,31 +15,39 @@ es = elasticsearch.Elasticsearch(["elastic:9200"])
 if not es.indices.exists(index='cobra'):
     sys.exit(1)
 
-query = {
-    "sort": [
-        {"datetime": {"order": "asc"}},  # , "format": "strict_date_optional_time_nanos"
-    ],
-    "query": {
-        "bool": {
-            "filter": [{
-                "range": {
-                    "datetime": {
-                        "gte": (datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d %H:%M:%S"),
-                        "lte": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+def get_all_hits_for_the_last(days=2):
+    query = {
+        "sort": [
+            {"datetime": {"order": "asc"}},  # , "format": "strict_date_optional_time_nanos"
+        ],
+        "query": {
+            "bool": {
+                "filter": [{
+                    "range": {
+                        "datetime": {
+                            "gte": (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S"),
+                            "lte": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        }
                     }
-                }
-            }]
-        }
-    },
-    "size": 1000
-}
+                }]
+            }
+        },
+        "size": 1000
+    }
+    locations = []
+    results = es.search(index="cobra", body=query, scroll="10m")
+    while len(results["hits"]["hits"]) > 0:
+        scroll_id = results["_scroll_id"]
+        locations += results["hits"]["hits"]
+        results = es.scroll(scroll_id=scroll_id, scroll="10m")
+    return locations
 
 
 def get_map():
     tracks = [[]]
     parked = True
-    res = es.search(index="cobra", body=query, )
-    hits = res["hits"]["hits"]
+    hits = get_all_hits_for_the_last(days=5)
     for hit in hits:
         row = hit["_source"]
         if row["operation"] == "acc on":
